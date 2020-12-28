@@ -1,0 +1,29 @@
+version: '3'
+
+services: 
+
+    nodeapp:
+      build:
+        context: ./nodeapp
+        dockerfile: Dockerfile.prod
+      container_name: nodeapp
+      networks: 
+        - nodeappnet
+      tty: true        
+      ports:
+        - "3000:3000"
+    
+    nginx:
+      build:
+        context: ./nginx
+        dockerfile: Dockerfile.prod
+      restart: always
+      networks: 
+        - nodeappnet
+      tty: true
+      ports:
+        - "80:80"
+
+networks: 
+  nodeappnet:
+    driver: bridge
