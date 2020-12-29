@@ -4,44 +4,46 @@ services:
   
     nodeapp:
       build:
-        context: ./nodeapp
-        dockerfile: Dockerfile.prod
+        context: nodeapp
+        dockerfile: Dockerfile.prod        
       container_name: nodeapp
+      restart: always      
+      entrypoint: dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh
       networks: 
         - nodeappnet
       tty: true        
       ports:
-        - "3000:3000"
+        - 3000:3000
       depends_on:
         - db
-        - nginx
     
     nginx:
       build:
-        context: ./nginx
+        context: nginx
         dockerfile: Dockerfile.prod
+      container_name: nginx
       restart: always
-      networks: 
+      networks:
         - nodeappnet
       tty: true
       ports:
-        - "8080:8080"
+        - 8080:8080
+      depends_on: 
+        - nodeapp
       
     db:
       image: mysql:5.7
       command: --innodb-use-native-aio=0
-      container_name: nodeappdb
+      container_name: db
       restart: always
-      tty: true
-      volumes: 
+      volumes:
         - /tmp/mysql:/var/lib/mysql
-        - ./mysql/setup.sql:/tmp/setup.sql
-        - ./mysql/rundb.sh:/docker-entrypoint-initdb.d/rundb.sh
+      ports:
+        - 3306:3306
       environment: 
         - MYSQL_DATABASE=nodedb
-        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_ROOT_PASSWORD=MYSQL_ROOT_PASSWORD
         - MYSQL_USER=root
-        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       networks: 
           - nodeappnet
 

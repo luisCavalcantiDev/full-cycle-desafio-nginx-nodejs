@@ -3,10 +3,10 @@ const app = express();
 const mysql = require('mysql');
 
 const config = {
-  host: 'nodeappdb',
+  host: 'db',
   user: 'root',
   password: 'root',
-  database: 'nodeappdb'
+  database: 'nodedb'
 };
 
 app.get('/', (req, res) => {
@@ -14,23 +14,14 @@ app.get('/', (req, res) => {
 });
 
 app.listen(3000, () => {
-  //createDatabase();
-  //createTable();
+  const connection = mysql.createConnection(config);
+  // connection.connect(function (err) {
+  //   if (err) throw err; {
+  //     console.log('Successfully connected to MySQL container');
+  //   }
+  // })
 
   console.log('Server is up and running');
 });
 
-function createTable() {
-  const connection = mysql.createConnection(config);
-  const sql = `create table people(id int not null auto_increment, name varchar(255), primary key(id));`;
-  connection.query(sql);
-  connection.end();
-}
-
-function createDatabase() {
-  const connection = mysql.createConnection(config);
-  const sql = `create database nodeappdb;`;
-  connection.query(sql);
-  connection.end();
-}
 
